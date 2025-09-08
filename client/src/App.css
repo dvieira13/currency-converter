@@ -1,0 +1,63 @@
+#root {
+  width: 90%;
+  margin: 50px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+.converter-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.temp-input {
+  font-size: 28px;
+  width: 150px;
+  border-radius: 8px;
+  border: 2px solid #E6E6E6;
+  padding: 5px;
+}
+
+.converter-row {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.conversion-icon {
+  height: 40px;
+}
+
+.input-container,
+.result-container {
+  display: flex;
+  align-items: baseline;
+}
+
+.input-container {
+  gap: 8px;
+}
+
+.input-container .body-copy,
+.result-container .body-copy {
+  width: 86px;
+}
+
+.result-container {
+  gap: 10px;
+}
+
+.result {
+  min-width: 100px;
+  text-align: end;
+}
+
+@media (max-width: 767px) {
+  #root {
+    margin: 30px auto;
+    gap: 20px;
+  }
+}
