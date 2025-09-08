@@ -59,7 +59,7 @@ function App() {
 
   return (
     <>
-      <h1>Temperature Converter</h1>
+      <h1>Currency Converter</h1>
 
       <div className="converter-container">
         {conversions.map(({ from, to }) => {
