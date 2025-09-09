@@ -1,33 +1,45 @@
-export {};
+// convert.ts
+export interface ConversionResult {
+  source: string;
+  target: string;
+  value: number;
+  rate: number;
+  converted: string;
+}
 
-export function convertTemperature(
-  value: number,               // must be a number
-  from: "C" | "F" | "K",       // only these strings
-  to: "C" | "F" | "K"          // only these strings
-): number {                     // return type is number
-  let celsius: number;
-
-  // Normalize input to Celsius
-  switch (from) {
-    case "F":
-      celsius = (value - 32) * (5 / 9);
-      break;
-    case "K":
-      celsius = value - 273.15;
-      break;
-    case "C":
-    default:
-      celsius = value;
+export async function convertCurrency(
+  valueStr: string,
+  source: string,
+  target: string,
+  apiKey: string
+): Promise<ConversionResult> {
+  if (!valueStr || !source || !target) {
+    throw new Error("Missing value, source, or target");
   }
 
-  // Convert from Celsius to target
-  switch (to) {
-    case "F":
-      return celsius * (9 / 5) + 32;
-    case "K":
-      return celsius + 273.15;
-    case "C":
-    default:
-      return celsius;
+  const response = await fetch(
+    `https://api.currencyapi.com/v3/latest?apikey=${apiKey}&currencies=${target}&base_currency=${source}`
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch currency data");
   }
+
+  const data = await response.json();
+
+  // Extract the exchange rate safely
+  const rate = data.data?.[target]?.value;
+  if (!rate) {
+    throw new Error("Target currency not found");
+  }
+
+  const converted = parseFloat(valueStr) * rate;
+
+  return {
+    source,
+    target,
+    value: parseFloat(valueStr),
+    rate,
+    converted: converted.toFixed(2),
+  };
 }

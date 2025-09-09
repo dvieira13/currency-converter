@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { convertTemperature } from "./convert";
+import { convertCurrency } from "./convert";
 
 const app = express();
 const PORT = 4000;
@@ -8,21 +8,37 @@ const PORT = 4000;
 app.use(cors());
 app.use(express.json());
 
-app.get("/api/convert", (req: Request, res: Response) => {
-  const value = req.query.value as string | undefined;
-  const from = req.query.from as "C" | "F" | "K" | undefined;
-  const to = req.query.to as "C" | "F" | "K" | undefined;
+const API_KEY = "cur_live_mmRid4Y48HO3fAnZKCNciJ9GXsvXrZe6PuSuElY1";
 
-  if (!value || !from || !to || isNaN(parseFloat(value))) {
-    return res.status(400).json({ error: "Missing or invalid parameters" });
+// Define a typed query interface (strings only)
+interface ConvertQuery {
+  value?: string;
+  source?: string;
+  target?: string;
+}
+
+// Route with typed query params
+app.get(
+  "/api/convert",
+  async (req: Request<{}, {}, {}, ConvertQuery>, res: Response) => {
+    const { value, source, target } = req.query;
+
+    if (!value || !source || !target) {
+      return res.status(400).json({ error: "Missing value, source, or target" });
+    }
+
+    try {
+      const result = await convertCurrency(value, source, target, API_KEY);
+      res.json(result);
+    } catch (err: any) {
+      if (err.message === "Target currency not found") {
+        return res.status(404).json({ error: err.message });
+      }
+      return res.status(500).json({ error: err.message });
+    }
   }
-
-  const numValue = parseFloat(value);
-  const result = convertTemperature(numValue, from, to);
-
-  res.json({ from, to, input: numValue, output: result });
-});
+);
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });

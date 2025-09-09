@@ -1,4 +1,4 @@
-# Temperature Converter
+# Currency Converter
 
 Full-stack TypeScript project:
 - **Client**: React + Vite + TypeScript
