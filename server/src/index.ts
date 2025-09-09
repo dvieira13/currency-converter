@@ -1,14 +1,17 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { convertCurrency } from "./convert";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
-const PORT = 4000;
+
+//need to strongly type API key value
+const apiKey = process.env.CURRENCIES_API_KEY || "";
 
 app.use(cors());
 app.use(express.json());
-
-const API_KEY = "cur_live_mmRid4Y48HO3fAnZKCNciJ9GXsvXrZe6PuSuElY1";
 
 // Define a typed query interface (strings only)
 interface ConvertQuery {
@@ -17,7 +20,6 @@ interface ConvertQuery {
   target?: string;
 }
 
-// Route with typed query params
 app.get(
   "/api/convert",
   async (req: Request<{}, {}, {}, ConvertQuery>, res: Response) => {
@@ -27,8 +29,13 @@ app.get(
       return res.status(400).json({ error: "Missing value, source, or target" });
     }
 
+
+    if (!value || !source || !target) {
+      return res.status(400).json({ error: "Missing value, source, or target" });
+    }
+
     try {
-      const result = await convertCurrency(value, source, target, API_KEY);
+      const result = await convertCurrency(value, source, target, apiKey);
       res.json(result);
     } catch (err: any) {
       if (err.message === "Target currency not found") {
@@ -39,6 +46,6 @@ app.get(
   }
 );
 
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Server running at http://localhost:${process.env.PORT}`);
 });
